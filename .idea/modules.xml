@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/JDBC.iml" filepath="$PROJECT_DIR$/JDBC.iml" />
       <module fileurl="file://$PROJECT_DIR$/JDBCChallenges/JDBCChallenges.iml" filepath="$PROJECT_DIR$/JDBCChallenges/JDBCChallenges.iml" />
       <module fileurl="file://$PROJECT_DIR$/MySQLMusic/MySQLMusic.iml" filepath="$PROJECT_DIR$/MySQLMusic/MySQLMusic.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PreparedStatement/PreparedStatement.iml" filepath="$PROJECT_DIR$/PreparedStatement/PreparedStatement.iml" />
       <module fileurl="file://$PROJECT_DIR$/QueryMusic/QueryMusic.iml" filepath="$PROJECT_DIR$/QueryMusic/QueryMusic.iml" />
     </modules>
   </component>
