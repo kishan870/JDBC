@@ -1,11 +1,12 @@
 import java.sql.*;
+import java.util.Arrays;
 
 public class MusicDML {
 
     public static void main(String[] args) {
 
         try (Connection connection = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/music",
+                "jdbc:mysql://localhost:3306/music?continueBatchOnError=false",
                 System.getenv("MYSQL_USER"),
                 System.getenv("MYSQL_PASS"));
              Statement statement = connection.createStatement();
@@ -16,10 +17,16 @@ public class MusicDML {
             if (!executeSelect(statement, tableName, columnName, columnValue)) {
                 insertArtistAlbum(statement, columnValue, columnValue);
             } else {
-//                deleteRecord(statement, tableName, columnName, columnValue);
-                updateRecord(statement, tableName, columnName,
-                        columnValue, columnName,
-                        columnValue.toUpperCase());
+                try {
+                    deleteArtistAlbum(connection, statement,
+                            columnValue, columnValue);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                executeSelect(statement, "music.albumview", "album_name",
+                        columnValue);
+                executeSelect(statement, "music.albums", "album_name",
+                        columnValue);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -155,6 +162,35 @@ public class MusicDML {
         }
         executeSelect(statement, "music.albumview", "album_name",
                 "Bob Dylan");
+    }
+
+    private static void deleteArtistAlbum(Connection conn, Statement statement,
+                                          String artistName, String albumName)
+            throws SQLException {
+
+        try {
+            System.out.println("AUTOCOMMIT = " + conn.getAutoCommit());
+            conn.setAutoCommit(false);
+            String deleteSongs = """
+                    DELETE FROM music.songs WHERE album_id =
+                    (SELECT ALBUM_ID from music.albums WHERE album_name = '%s')"""
+                    .formatted(albumName);
+
+            String deleteAlbums = "DELETE FROM music.albums WHERE album_name='%s'"
+                    .formatted(albumName);
+            String deleteArtist = "DELETE FROM music.artists WHERE artist_name='%s'"
+                    .formatted(artistName);
+            statement.addBatch(deleteSongs);
+            statement.addBatch(deleteAlbums);
+            statement.addBatch(deleteArtist);
+            int[] results = statement.executeBatch();
+            System.out.println(Arrays.toString(results));
+            conn.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            conn.rollback();
+        }
+        conn.setAutoCommit(true);
     }
 
 }
